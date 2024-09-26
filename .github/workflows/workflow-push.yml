@@ -67,7 +67,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build docker image
-        run: docker build -t ${{ vars.DOCKER_NAME }}/myapp .
+        run: docker build -t ${{ vars.DOCKER_NAME }}/myapp ./08_github-actions
 
       - name: push docker image
         run: docker push ${{ vars.DOCKER_NAME }}/myapp
