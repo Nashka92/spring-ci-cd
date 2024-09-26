@@ -1,14 +1,23 @@
-name: Workflow qui se déclenche lors de la création d'une issue
+name: Workflow d'issue
+
 on:
   issues:
-    types: opened
-
+    types:
+      - opened
 
 jobs:
-  variables:
+  commentaire:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
-      - name: message issue
+      - name: Réponse à l'auteur de l'issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
         run: |
-          echo "Bonjour ${{ github.actor }}"
-          echo "Nous avons bien pris en compte votre problème du nom de: ${{ github.event_name }}"
+          curl -H "Authorization: token $GH_TOKEN" \
+            -X POST \
+            -d '{"body":"Bonjour @'${ISSUE_AUTHOR}',\n\nNous avons bien pris en compte votre souci : **'${ISSUE_TITLE}'**. Nous allons y jeter un œil."}' \
+            https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments
