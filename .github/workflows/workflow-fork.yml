@@ -1,0 +1,14 @@
+name: Workflow lors d'un fork
+
+on:
+  fork:
+    types:
+      - created
+
+jobs:
+  fork_job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: afficher message lors d'un fork
+        run: echo "Merci d'avoir forké ce repo ! "
