@@ -44,16 +44,23 @@ jobs:
           name: springboot-app
           path: target/*.jar
 
-  docker:
-    name: Build and push Docker image
+  download:
+    # Etape 7 : Déclencher uniquement si le push est sur la branche main
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v3
+      - name: Récupérer l'artéfact
+        uses: actions/download-artifact@v4
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          name: springboot-app
+
+  docker:
+    # Ce job se déclenche uniquement si le job download a réussi et si la branche est main
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    needs: download
+    steps:
+      - name: login dockerhub
+        uses: docker/login-action@v3
+
