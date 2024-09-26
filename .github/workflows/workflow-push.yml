@@ -63,4 +63,12 @@ jobs:
     steps:
       - name: login dockerhub
         uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Build docker image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/spring_app .
+
+      - name: Push docker image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/spring_app
