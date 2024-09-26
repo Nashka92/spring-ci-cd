@@ -1,33 +1,44 @@
 name: Workflow lors d'un push
+# Ce workflow se déclenche lors d'un "push" sur le dépôt
 on: push
+
 jobs:
   build:
     name: Build, test et run application
+    # Le job sera exécuté sur la dernière version d'Ubuntu
     runs-on: ubuntu-latest
+
     steps:
+      # Étape 1: Récupération du code de l'application depuis le dépôt GitHub
       - name: Récupération de notre application
         uses: actions/checkout@v4
 
+      # Étape 2: Configuration du JDK version 17 en utilisant la distribution 'temurin'
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
           java-version: "17"
           distribution: 'temurin'
 
+      # Étape 3: Installation des dépendances Maven nécessaires à l'application
       - name: Installation des dépendances
         run: mvn install
 
+      # Étape 4: Mise en cache du répertoire local Maven pour éviter de retélécharger les dépendances à chaque build
       - name: Cache local Maven repository
         uses: actions/cache@v4
         with:
           path: ~/.m2/repository
+          # Utilisation de l'OS et du hash du fichier pom.xml pour la clé du cache
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
 
+      # Étape 5: Compilation et empaquetage de l'application avec Maven
       - name: Build de l'application
         run: mvn package
 
+      # Étape 6: Téléversement de l'artefact (le fichier .jar généré) pour l'utiliser dans d'autres jobs ou le récupérer plus tard
       - name: Artifact upload
         uses: actions/upload-artifact@v4
         with:
