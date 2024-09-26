@@ -19,5 +19,5 @@ jobs:
         run: |
           curl -H "Authorization: token $GH_TOKEN" \
             -X POST \
-            -d '{"body":"Bonjour @'${ISSUE_AUTHOR}',\n\nNous avons bien pris en compte votre souci : **'${ISSUE_TITLE}'**. Nous allons y jeter un œil."}' \
+            -d '{"body":"Bonjour @'${ISSUE_AUTHOR}',\n\nNous avons bien pris en compte votre souci : **'${ISSUE_TITLE}'**. Nous allons y jeter un oeil."}' \
             https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments
