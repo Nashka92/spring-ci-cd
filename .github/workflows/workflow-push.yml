@@ -2,13 +2,13 @@ name: Workflow lors d'un push
 on: push
 jobs:
   build:
-    name: Build test et run application
+    name: Build, test et run application
     runs-on: ubuntu-latest
     steps:
       - name: Récupération de notre application
         uses: actions/checkout@v4
 
-      - name: setup JDK
+      - name: Setup JDK
         uses: actions/setup-java@v4
         with:
           java-version: "17"
@@ -17,5 +17,19 @@ jobs:
       - name: Installation des dépendances
         run: mvn install
 
+      - name: Cache local Maven repository
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
       - name: Build de l'application
-        run: echo "build de l'application"
+        run: mvn package
+
+      - name: Artifact upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: springboot-app
+          path: target/*.jar
