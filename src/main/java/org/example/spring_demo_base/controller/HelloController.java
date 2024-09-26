@@ -13,7 +13,7 @@ public class HelloController {
 
     @RequestMapping("/")
     public String sayHello(){
-        System.out.println("je passe dans la methode sayHello !!");
+        System.out.println("je passe dans la methode sayHello !!!!");
         return "hello";
     }
 
