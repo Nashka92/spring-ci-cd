@@ -6,7 +6,7 @@ FROM maven:3.8.1-openjdk-17 AS builder
 WORKDIR /app
 
 # Copier le fichier pom.xml dans le répertoire de travail
-COPY pom.xml .
+COPY ../pom.xml .
 
 # Télécharger les dépendances nécessaires à la compilation en mode hors-ligne
 RUN mvn dependency:go-offline
