@@ -56,7 +56,6 @@ jobs:
           name: springboot-app
 
   docker:
-    # Ce job se déclenche uniquement si le job download a réussi et si la branch est main
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     needs: download
@@ -68,7 +67,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build docker image
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/spring_demo_base .
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/spring-image-exercice .
 
       - name: Push docker image
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/spring_demo_base
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/spring-image-exercice
