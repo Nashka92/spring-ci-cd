@@ -1,21 +1,14 @@
-name: Workflow d'issue
-
+name: Workflow qui se déclenche lors de la création d'une issue
 on:
   issues:
-    types:
-      - opened
+    types: opened
+
 
 jobs:
-  commentaire:
+  variables:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
     steps:
-      - name: Réponse à l'auteur de l'issue
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
-          ISSUE_TITLE: ${{ github.event.issue.title }}
-          ISSUE_URL: ${{ github.event.issue.html_url }}
-        run: gh issue comment $ISSUE_URL --body "bonjour @'${ISSUE_AUTHOR}'. Nous avons bien pris en compte votre problème
-          du nom ${ISSUE_TITLE}' !"
+      - name: message issue
+        run: |
+          echo "Bonjour ${{ github.actor }}"
+          echo "Nous avons bien pris en compte votre problème du nom de: ${{ github.event_name }}"
