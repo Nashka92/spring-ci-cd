@@ -1,0 +1,21 @@
+name: Workflow lors d'un push
+on: push
+jobs:
+  build:
+    name: Build test et run application
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupération de notre application
+        uses: actions/checkout@v4
+
+      - name: setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: 'temurin'
+
+      - name: Installation des dépendances
+        run: mvn install
+
+      - name: Build de l'application
+        run: echo "build de l'application"
