@@ -1,0 +1,27 @@
+name: workflow qui se déclenche lors de la création d'une issue
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  variables:
+    runs-on: ubuntu-latest
+    steps:
+      - name: mes variables d'environnements
+        env:
+          MA_VARIABLE: ${{ vars.MA_VARIABLE }}
+          MON_SECRET: ${{ secrets.MON_SECRET }}
+        run: |
+          echo "le secret est $MON_SECRET"
+          echo "Ma variable est $MA_VARIABLE"
+  commentaire:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Réponse a une issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+        run: gh issue comment $ISSUE_URL --body "merci d'avoir ouvert cette issue !"
