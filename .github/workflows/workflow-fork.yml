@@ -2,11 +2,9 @@ name: Workflow lors d'un fork
 
 on:
   fork:
-    types:
-      - created
 
 jobs:
-  fork_job:
+  variables:
     runs-on: ubuntu-latest
 
     steps:
