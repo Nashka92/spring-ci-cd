@@ -67,8 +67,8 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build docker image
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/spring:v1 .
+        run: docker build -t ${{ vars.DOCKER_NAME }}/spring:v1 .
 
       - name: push docker image
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/spring:v1
+        run: docker push ${{ vars.DOCKER_NAME }}/spring:v1
 
