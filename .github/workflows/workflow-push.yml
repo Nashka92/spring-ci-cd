@@ -13,65 +13,77 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Étape 2: Configuration du JDK version 17 en utilisant la distribution 'temurin'
+      # Étape 2: Configuration du JDK version 17 en utilisant la distribution 'temurin' (la version d'OpenJDK fournie par Eclipse)
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          java-version: '17' # Spécifie l'utilisation de Java 17
+          distribution: 'temurin' # Distribution utilisée pour le JDK
 
-      # Étape 3: Installation des dépendances Maven nécessaires à l'application
+      # Étape 3: Installation des dépendances Maven nécessaires à l'application (va télécharger toutes les bibliothèques requises)
       - name: Install dependencies
-        run: mvn install
+        run: mvn install # Commande Maven pour installer les dépendances
 
-      # Étape 4: Mise en cache du répertoire local Maven pour éviter de retélécharger les dépendances à chaque build
+      # Étape 4: Mise en cache du répertoire local Maven pour éviter de retélécharger les dépendances à chaque build (gain de temps)
       - name: Cache Maven repository
         uses: actions/cache@v4
         with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          path: ~/.m2/repository # Répertoire où sont stockées les dépendances Maven
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }} # Clé unique pour identifier le cache
           restore-keys: |
-            ${{ runner.os }}-maven-
+            ${{ runner.os }}-maven- # Clé de restauration du cache si la clé actuelle n'est pas trouvée
 
-      # Étape 5: Compilation et empaquetage de l'application avec Maven
+      # Étape 5: Compilation et empaquetage de l'application avec Maven (crée un fichier .jar pour ton projet Spring Boot)
       - name: Build application
-        run: mvn package
+        run: mvn package # Commande pour compiler et empaqueter l'application
 
       # Étape 6: Téléversement de l'artefact (le fichier .jar généré) pour l'utiliser dans d'autres jobs ou le récupérer plus tard
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: springboot-app
-          path: target/*.jar
+          name: springboot-app # Nom sous lequel l'artefact sera stocké
+          path: target/*.jar # Chemin du fichier .jar généré par Maven
 
   download:
+    # Ce job ne s'exécute que si la branche est "main"
     if: ${{ github.ref == 'refs/heads/main' }}
+    # Il nécessite que le job "build" soit exécuté avec succès avant
     runs-on: ubuntu-latest
     needs: build
+
     steps:
+      # Étape 1: Récupérer l'artéfact (fichier .jar) généré par le job précédent
       - name: Récupérer l'artéfact
         uses: actions/download-artifact@v4
         with:
-          name: springboot-app
+          name: springboot-app # Récupère l'artefact appelé "springboot-app"
 
   docker:
     name: Build and push Docker image
+    # Ce job ne s'exécute que si le job "download" est réussi
     runs-on: ubuntu-latest
     needs: download
+
     steps:
+      # Étape 1: Récupération du code de l'application depuis le dépôt GitHub
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Étape 2: Connexion à DockerHub pour authentifier l'utilisateur
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
-          username: ${{ vars.DOCKER_NAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ vars.DOCKER_NAME }} # Utilisateur DockerHub récupéré à partir des variables GitHub
+          password: ${{ secrets.DOCKERHUB_TOKEN }} # Token DockerHub sécurisé récupéré à partir des secrets
+
+      # Étape 3: Récupération du code source (requis pour construire l'image Docker)
       - name: checkout code
         uses: actions/checkout@v4
 
+      # Étape 4: Construction de l'image Docker à partir du Dockerfile
       - name: Build docker image
-        run: docker build -t ${{ vars.DOCKER_NAME }}/builder .
+        run: docker build -t ${{ vars.DOCKER_NAME }}/builder . # Crée une image Docker appelée "builder" avec le nom d'utilisateur DockerHub
 
+      # Étape 5: Téléversement de l'image Docker sur DockerHub
       - name: push docker image
-        run: docker push ${{ vars.DOCKER_NAME }}/builder
+        run: docker push ${{ vars.DOCKER_NAME }}/builder # Pousse l'image Docker "builder" vers DockerHub
